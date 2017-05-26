@@ -1,0 +1,6 @@
+{
+  "database": "senior_enrichment",
+  "host": "localhost",
+  "dialect": "postgres",
+  "logging": false
+}

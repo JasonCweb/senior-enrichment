@@ -11,20 +11,20 @@ console.log(chalk.yellow(`Opening database connection to ${connectionString}`));
 
 // create the database instance that can be used in other database files
 const db = module.exports = new Sequelize(connectionString, {
-  logging: debug, // export DEBUG=sql in the environment to get SQL queries 
+  logging: debug, // export DEBUG=sql in the environment to get SQL queries
   native: true    // lets Sequelize know we can use pg-native for ~30% more speed (if you have issues with pg-native feel free to take this out and work it back in later when we have time to help)
 });
 
 // run our models file (makes all associations for our Sequelize objects)
-require('./models')
+require('./models');
 
 // sync the db, creating it if necessary
-function sync(force=false, retries=0, maxRetries=5) {
-  return db.sync({force})
+function sync(force=true, retries=0, maxRetries=5) {
+  return db.sync({force: false})
   .then(ok => console.log(`Synced models to db ${connectionString}`))
   .catch(fail => {
     // Don't do this auto-create nonsense in prod, or
-    // if we've retried too many times. 
+    // if we've retried too many times.
     if (process.env.NODE_ENV === 'production' || retries > maxRetries) {
       console.error(chalk.red(`********** database error ***********`))
       console.error(chalk.red(`    Couldn't connect to ${connectionString}`))
@@ -39,6 +39,51 @@ function sync(force=false, retries=0, maxRetries=5) {
       require('child_process').exec(`createdb "${name}"`, resolve)
     ).then(() => sync(true, retries + 1))
   })
+
 }
 
-db.didSync = sync();
+db.didSync = sync()
+// .then(() => {
+//  console.log(models)
+//  Campus.create({
+//   name: 'Io',
+//   nickname: 'a strange world'
+// })})
+// .then(() => {
+//    Campus.create({
+//     name: 'Deimos',
+//     nickname: 'brother of Phobos'
+//    })
+//   })
+// .then(() => {
+//   Student.create({
+//   name: 'Isaac Newton',
+//   email: 'imNewton@gmail.com',
+//   campusId: 3
+// })})
+// .then(() => {
+//   Student.create({
+//   name: 'George Costanza',
+//   email: 'cantStandYa@gmail.com',
+//   campusId: 4
+//   })
+// })
+// .then(() => {
+//   Campus.create({
+//     name: 'Deimos',
+//     nickname: 'brother of Phobos'
+//    })
+// })
+// .then(() => {
+//   Student.create({
+//   name: 'Isaac Newton',
+//   email: 'imNewton@gmail.com',
+//   campusId: 3
+// })})
+// .then(() => {
+//   Student.create({
+//   name: 'George Costanza',
+//   email: 'cantStandYa@gmail.com',
+//   campusId: 4
+//   })
+// })
